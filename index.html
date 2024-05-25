@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Juego de la Escalera</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: row; /* Cambiado a disposición horizontal */
+        align-items: center;
+        justify-content: space-around;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .box-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .box {
+        width: 200px;
+        height: 200px;
+        margin: 20px;
+        border: 1px solid #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        position: relative;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        transition: background 0.5s ease; /* Transición de color */
+      }
+
+      .box h2 {
+        margin-bottom: 10px;
+      }
+
+      .box h1 {
+        font-size: 36px; /* Tamaño del texto de la casilla número */
+        margin-bottom: 5px; /* Espaciado inferior adicional */
+      }
+
+      .box:active {
+        transform: scale(0.95);
+      }
+
+      button {
+        margin-top: 20px; /* Espaciado superior adicional */
+        padding: 15px 20px; /* Ajustar el relleno del botón */
+        font-size: 20px; /* Tamaño de fuente del botón */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Juego de la Escalera</h1>
+    <h3>Daniel Henao Moreno 5-2</h3>
+
+    <div class="container">
+      <div class="box-container">
+        <h2>Movimientos</h2>
+        <div class="box" id="colorBox"></div>
+      </div>
+      <div class="box-container">
+        <h2>Pronombre</h2>
+        <div class="box" id="pronounBox"></div>
+      </div>
+      <div class="box-container">
+        <h2>Tiempo</h2>
+        <div class="box" id="timeBox"></div>
+      </div>
+    </div>
+
+    <button onclick="simulateDiceRoll()">Presiona aquí</button>
+
+    <script>
+      function simulateDiceRoll() {
+        generateColor();
+      }
+
+      function generateColor() {
+        var colors = ["yellow", "green", "red"];
+        var selectedColor = colors[Math.floor(Math.random() * colors.length)];
+
+        var colorBox = document.getElementById("colorBox");
+        colorBox.style.background = `linear-gradient(45deg, ${selectedColor}, #f0f0f0)`;
+
+        var number;
+        switch (selectedColor) {
+          case "yellow":
+            number = 1;
+            break;
+          case "green":
+            number = 2;
+            break;
+          case "red":
+            number = 0;
+            break;
+        }
+
+        colorBox.innerHTML = `<h1>${number}</h1>`; // Usar h1 para el número
+
+        applyColorToBoxes(selectedColor, number);
+      }
+
+      function applyColorToBoxes(selectedColor, number) {
+        var pronounBox = document.getElementById("pronounBox");
+        var timeBox = document.getElementById("timeBox");
+
+        pronounBox.style.background = `linear-gradient(45deg, ${selectedColor}, #f0f0f0)`;
+        timeBox.style.background = `linear-gradient(45deg, ${selectedColor}, #f0f0f0)`;
+
+        // Mostrar pronombres y tiempos aleatorios
+        pronounBox.innerHTML = getRandomPronoun();
+        timeBox.innerHTML = getRandomTime();
+
+        // Mostrar X solo si es rojo y número es 0
+        if (selectedColor === "red" && number === 0) {
+          pronounBox.innerHTML = "<h1>X</h1>";
+          timeBox.innerHTML = "<h1>X</h1>";
+        }
+      }
+
+      function getRandomPronoun() {
+        var pronouns = [
+          "YO",
+          "TU",
+          "USTED",
+          "EL",
+          "ELLA",
+          "NOSOTROS",
+          "USTEDES",
+          "ELLOS",
+          "ELLAS",
+        ];
+        return pronouns[Math.floor(Math.random() * pronouns.length)];
+      }
+
+      function getRandomTime() {
+        var times = ["PASADO", "PRESENTE", "FUTURO"];
+        return times[Math.floor(Math.random() * times.length)];
+      }
+    </script>
+  </body>
+</html>

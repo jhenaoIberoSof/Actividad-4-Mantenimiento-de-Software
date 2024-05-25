@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Dinámico de Línea de Tiempo</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      .timeline-container {
+        position: relative;
+        margin-top: 40px;
+      }
+
+      .timeline {
+        position: relative;
+        width: 100%;
+        height: 20px;
+        background-color: #00cc00; /* Cambié el color a verde */
+        cursor: pointer;
+      }
+
+      .event {
+        position: absolute;
+        height: 100%;
+        width: 2px;
+        background-color: #007bff;
+      }
+
+      .selected-event {
+        position: absolute;
+        height: 100%;
+        width: 2px;
+        background-color: #ff0000; /* Cambié el color a rojo */
+      }
+
+      #dashboard {
+        margin-top: 40px;
+      }
+
+      #indicator {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 2px solid #007bff;
+        margin: 20px auto;
+        text-align: center;
+      }
+
+      #indicator span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 16px;
+      }
+
+      #totalizador {
+        text-align: center;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Dashboard</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Otra Página</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false">
+              Opciones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#">Opción 1</a>
+              <a class="dropdown-item" href="#">Opción 2</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#">Opción 3</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1 class="text-center">Dashboard Dinámico de Línea de Tiempo</h1>
+
+      <div class="timeline-container">
+        <div class="timeline" id="timeline"></div>
+      </div>
+
+      <div id="dashboard">
+        <div class="row">
+          <div class="col-md-6">
+            <canvas id="chart"></canvas>
+          </div>
+          <div class="col-md-6">
+            <div id="event-info"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="indicator">
+        <span id="indicator-text">100%</span>
+      </div>
+
+      <div id="totalizador">
+        Totalizador acumulado: <span id="totalizador-value">0</span> minutos
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+      var timeline = document.getElementById("timeline");
+      var chartCanvas = document.getElementById("chart");
+      var eventInfoElement = document.getElementById("event-info");
+      var indicator = document.getElementById("indicator");
+      var indicatorText = document.getElementById("indicator-text");
+      var totalizadorValue = document.getElementById("totalizador-value");
+      var data = generateRandomData();
+      var totalizador = 0;
+
+      function generateRandomData() {
+        var data = [];
+        for (var i = 0; i <= 480; i += 30) {
+          data.push(Math.round(Math.random() * 100));
+        }
+        return data;
+      }
+
+      function updateTimeline() {
+        timeline.innerHTML = "";
+        for (var i = 0; i <= 480; i += 30) {
+          var eventDiv = document.createElement("div");
+          eventDiv.className = "event";
+          eventDiv.style.left = (i / 480) * 100 + "%";
+          timeline.appendChild(eventDiv);
+        }
+      }
+
+      function updateChart() {
+        var labels = [];
+        for (var i = 0; i <= 480; i += 30) {
+          labels.push((i / 480) * 100 + "%");
+        }
+
+        var ctx = chartCanvas.getContext("2d");
+        var myChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Datos Dinámicos",
+                data: data,
+                borderColor: "#007bff",
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              x: {
+                display: true,
+                title: {
+                  display: true,
+                  text: "Porcentaje de tiempo",
+                },
+              },
+              y: {
+                display: true,
+                title: {
+                  display: true,
+                  text: "Datos",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function showEventInfo(selectedPercent) {
+        var minutes = (selectedPercent / 100) * 480;
+        eventInfoElement.innerHTML =
+          "<h3>Información del Evento</h3>" +
+          "<p>Has hecho clic en el punto " +
+          selectedPercent +
+          "% de la línea de tiempo, lo que corresponde a " +
+          Math.round(minutes) +
+          " minutos.</p>";
+      }
+
+      function updateIndicator(percent) {
+        indicatorText.innerText = percent + "%";
+        indicator.style.transform =
+          "rotate(" + (360 - (percent / 100) * 360) + "deg)";
+      }
+
+      timeline.addEventListener("click", function (event) {
+        var timelineRect = timeline.getBoundingClientRect();
+        var clickX = event.clientX - timelineRect.left;
+        var percent = (clickX / timelineRect.width) * 100;
+
+        showEventInfo(percent);
+
+        // Acumula el porcentaje y actualiza el indicador
+        totalizador += percent;
+        totalizadorValue.innerText = totalizador.toFixed(2); // Muestra dos decimales
+
+        // Añade la clase 'selected-event' al evento actual
+        var selectedEvent = document.createElement("div");
+        selectedEvent.className = "selected-event";
+        selectedEvent.style.left = (clickX / timelineRect.width) * 100 + "%";
+        timeline.appendChild(selectedEvent);
+      });
+
+      // Actualiza la línea de tiempo y el gráfico inicialmente
+      updateTimeline();
+      updateChart();
+    </script>
+  </body>
+</html>
